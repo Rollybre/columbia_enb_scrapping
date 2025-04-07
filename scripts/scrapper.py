@@ -115,7 +115,7 @@ def report_page_extract(csv_path, url_col_name, driver_path='driver/geckodriver'
                 if verbose:
                     print("Bouton d'acceptation des cookies non trouvé.")
 
-            title = driver.find_element(By.CLASS_NAME, 'c-node__title').text
+            title = driver.find_element(By.CLASS_NAME, 'c-node__title').text.split('\n')
             text_content = driver.find_element(By.XPATH, "//article[@class='o-section o-section--small-margin']").text
 
             scraped_data.append({"url": url, "title": title, "content": text_content,})

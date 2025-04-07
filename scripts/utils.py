@@ -2,6 +2,9 @@ import pandas as pd
 import os
 import re
 
+from bs4 import BeautifulSoup
+
+
 def csv_to_txt(csv_file, col_name, col_name_title, outptput_dir, verbose=False): 
     """
     Convertit les colonnes d'un fichier CSV en fichiers texte individuels.
@@ -40,3 +43,38 @@ def csv_to_txt(csv_file, col_name, col_name_title, outptput_dir, verbose=False):
     return 
 
 
+
+def content_to_sections(r, verbose=False):
+
+    soup = BeautifulSoup(r, "html.parser")
+
+    # Sélectionne la zone de contenu (à adapter selon ta structure)
+    content = soup.select_one("section.o-content-from-editor")
+
+    # Liste pour stocker les sections
+    sections = []
+
+    # Variables de travail
+    current_title = None
+    current_content = []
+
+    # Parcours linéaire du contenu
+    for tag in content.find_all(recursive=False):
+        if tag.name == "h2":
+            # Si on rencontre un nouveau h2, on stocke la section précédente
+            if current_title:
+                sections.append((current_title, current_content))
+            current_title = tag.get_text(strip=True)
+            current_content = []
+        else:
+            if current_title:
+                current_content.append(str(tag))
+    # Stocke la dernière section
+    if current_title:
+        sections.append((current_title, current_content))
+    
+    if verbose: 
+        for i, (title, content) in enumerate(sections, 1):
+            print(f"\n=== Section {i} : {title} ===")
+            print("\n".join(content))
+    return sections
