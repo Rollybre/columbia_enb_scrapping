@@ -42,39 +42,38 @@ def csv_to_txt(csv_file, col_name, col_name_title, outptput_dir, verbose=False):
             print(f'Text file saved at {outptput_path}')
     return 
 
-
-
 def content_to_sections(r, verbose=False):
 
     soup = BeautifulSoup(r, "html.parser")
 
-    # Sélectionne la zone de contenu (à adapter selon ta structure)
+    # Cible la section principale (à adapter si besoin)
     content = soup.select_one("section.o-content-from-editor")
 
-    # Liste pour stocker les sections
+    # Prépare la liste des sections (titre + texte)
     sections = []
 
-    # Variables de travail
     current_title = None
-    current_content = []
+    current_text = []
 
-    # Parcours linéaire du contenu
     for tag in content.find_all(recursive=False):
         if tag.name == "h2":
-            # Si on rencontre un nouveau h2, on stocke la section précédente
+            # Si nouveau <h2>, stocke l'ancienne section
             if current_title:
-                sections.append((current_title, current_content))
+                full_text = "\n".join(current_text).strip()
+                sections.append((current_title, full_text))
             current_title = tag.get_text(strip=True)
-            current_content = []
+            current_text = []
         else:
             if current_title:
-                current_content.append(str(tag))
-    # Stocke la dernière section
+                current_text.append(tag.get_text(strip=True))
+
+    # Ajoute la dernière section
     if current_title:
-        sections.append((current_title, current_content))
-    
-    if verbose: 
-        for i, (title, content) in enumerate(sections, 1):
-            print(f"\n=== Section {i} : {title} ===")
-            print("\n".join(content))
+        full_text = "\n".join(current_text).strip()
+        sections.append((current_title, full_text))
+
+    # Affiche ou traite les résultats
+    if verbose :
+        for i, (title, text) in enumerate(sections, 1):
+            print(f"\n=== Section {i}: {title} ===\n{text}")
     return sections
