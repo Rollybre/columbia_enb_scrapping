@@ -77,3 +77,23 @@ def content_to_sections(r, verbose=False):
         for i, (title, text) in enumerate(sections, 1):
             print(f"\n=== Section {i}: {title} ===\n{text}")
     return sections
+
+
+def sections_to_row(df):
+    new_rows = []
+    for index, row in df.iterrows():
+        paragraphs = row["content"]  # Diviser le contenu en paragraphes
+        for para_index, para_title, paragraph in enumerate(paragraphs):
+            new_rows.append({
+                "page_title": row["title"],
+                "url": row["url"],
+                'is_daily_report': row['is_daily_report'],
+                "paragraph_index": para_index,
+                "paragraph_title": para_title,
+                "paragraph": paragraph
+                })
+        # Créer un nouveau DataFrame avec les paragraphes
+    new_df = pd.DataFrame(new_rows)
+
+    # Afficher le nouveau DataFrame
+    return new_df
