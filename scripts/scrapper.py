@@ -11,6 +11,9 @@ import pandas as pd
 from time import sleep
 import os
 
+
+from utils import content_to_sections, sections_to_row
+
 def main_page_extract(url, driver_path='driver/geckodriver', save=False, output_path='report_urls.csv', verbose=False):
     """
     Extracts report URLs from the main page of a conference website.
@@ -116,7 +119,9 @@ def report_page_extract(csv_path, url_col_name, driver_path='driver/geckodriver'
                     print("Bouton d'acceptation des cookies non trouvé.")
 
             title = driver.find_element(By.CLASS_NAME, 'c-node__title').text.split('\n')
-            text_content = driver.find_element(By.XPATH, "//article[@class='o-section o-section--small-margin']").text
+            text_content = driver.find_element(By.XPATH, "//article[@class='o-section o-section--small-margin']")
+
+            text_content = content_to_sections(text_content.get_attribute('innerHTML'))
 
             scraped_data.append({"url": url, "title": title, "content": text_content,})
             if verbose:
@@ -126,12 +131,12 @@ def report_page_extract(csv_path, url_col_name, driver_path='driver/geckodriver'
             if verbose:
                 print(f"Erreur lors du scraping de {url}: {e}")
                 
-    
-    
-    
+
     if save:
         df_scrape = pd.DataFrame(scraped_data)
         df_data= pd.merge(data, df_scrape, on= 'url', how= 'inner')
+        df_data['title'] = df_data['title'].apply(lambda x: x[0] if isinstance(x, list) else x)
+        df_data=sections_to_row(df_data)
         df_data.to_csv(output_path, index=False, encoding='utf-8')
     return scraped_data
 

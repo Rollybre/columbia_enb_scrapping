@@ -83,7 +83,7 @@ def sections_to_row(df):
     new_rows = []
     for index, row in df.iterrows():
         paragraphs = row["content"]  # Diviser le contenu en paragraphes
-        for para_index, para_title, paragraph in enumerate(paragraphs):
+        for para_index, (para_title, paragraph) in enumerate(paragraphs):
             new_rows.append({
                 "page_title": row["title"],
                 "url": row["url"],
