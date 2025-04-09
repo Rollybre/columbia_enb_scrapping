@@ -12,7 +12,7 @@ from time import sleep
 import os
 
 
-from utils import content_to_sections, sections_to_row
+from utils import content_to_sections, sections_to_row, content_to_paragraphs
 
 def main_page_extract(url, driver_path='driver/geckodriver', save=False, output_path='report_urls.csv', verbose=False):
     """
@@ -121,7 +121,8 @@ def report_page_extract(csv_path, url_col_name, driver_path='driver/geckodriver'
             title = driver.find_element(By.CLASS_NAME, 'c-node__title').text.split('\n')
             text_content = driver.find_element(By.XPATH, "//article[@class='o-section o-section--small-margin']")
 
-            text_content = content_to_sections(text_content.get_attribute('innerHTML'))
+            text_content = content_to_paragraphs(text_content.get_attribute('innerHTML'),verbose=True)
+
 
             scraped_data.append({"url": url, "title": title, "content": text_content,})
             if verbose:

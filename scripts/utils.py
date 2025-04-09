@@ -44,6 +44,7 @@ def csv_to_txt(csv_file, col_name, col_name_title, outptput_dir, verbose=False):
 
 def content_to_sections(r, verbose=False):
 
+
     soup = BeautifulSoup(r, "html.parser")
 
     # Cible la section principale (à adapter si besoin)
@@ -78,18 +79,41 @@ def content_to_sections(r, verbose=False):
             print(f"\n=== Section {i}: {title} ===\n{text}")
     return sections
 
+def content_to_paragraphs(r, verbose=False):
+    """
+    Convertit le contenu HTML en paragraphes en fonction de la balise <p>
+    """
+    soup = BeautifulSoup(r, "html.parser")
+
+    # Cible la section principale (à adapter si besoin)
+    content = soup.select_one("section.o-content-from-editor")
+
+    # Prépare la liste des sections (titre + texte)
+    paragraphs = []
+
+    for tag in content.find_all("p"):
+        text = tag.get_text(strip=True)
+        if text:
+            paragraphs.append(text)
+
+    # Affiche ou traite les résultats
+    if verbose :
+        for i, text in enumerate(paragraphs, 1):
+            print(f"\n=== Paragraphe {i} ===\n{text}")
+    return paragraphs
+
 
 def sections_to_row(df):
     new_rows = []
     for index, row in df.iterrows():
         paragraphs = row["content"]  # Diviser le contenu en paragraphes
-        for para_index, (para_title, paragraph) in enumerate(paragraphs):
+        for para_index, paragraph in enumerate(paragraphs):
             new_rows.append({
                 "page_title": row["title"],
                 "url": row["url"],
                 'is_daily_report': row['is_daily_report'],
                 "paragraph_index": para_index,
-                "paragraph_title": para_title,
+                #"paragraph_title": para_title,
                 "paragraph": paragraph
                 })
         # Créer un nouveau DataFrame avec les paragraphes
